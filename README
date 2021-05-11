@@ -1,0 +1,213 @@
+Name:                Anesu Gavhera
+Approximate Time:    38 Hours
+-----------------------------------------------------------------------------
+
+Acknowledgements:
+
+    - Used stackoverflow and other online forums for assistance in formatting
+      code and using certain packages
+    - Read through the "man" pages for ppm datatype
+    - Referenced Hanson multiple times
+
+Succesfully Implemented:
+
+1. ppmtrans
+    - The purpose of this program is to perform multiple transposition
+      functions on an image read through standard input, by using a
+      black box 2D array abstraction.
+    - ppmtrans relies on an abstract class called a2methods which in turn
+      has two written implementations for a 2D array, one in which the memory
+      is stored across several "blocks" in the cache and one in which memory
+      is chunked into the size of an individual "block" in the cache and
+      accessed that way.
+    - ppmtrans then relies on the pnm interface to interact with the image
+      files and output then.
+    - ppmtrans successfully performs all types of transpositions required by
+      by the assignment, including the extra-credit ones. This includes
+      0, 90, 180, and 270 degree rotations, horizontal and vertical flips,
+      and transpose operations.
+    - ppmtrans also successfully implements different traversals of the an
+      image including row-major, column-major and block accesses.
+
+      COMMANDS FOR RUNNING PPMTRANS
+        -rotate 90
+            Rotate image 90 degrees clockwise.
+        -rotate 180
+            Rotate image 180 degrees.
+        -rotate 270
+            Rotate image 270 degrees clockwise (or 90 ccw).
+        -rotate 0
+            Leave the image unchanged.
+        -flip horizontal
+            Mirror image horizontally (left-right).
+        -flip vertical
+            Mirror image vertically (top-bottom).
+        -transpose
+            Transpose image (across UL-to-LR axis).
+        -time <timing_file>
+            Create timing data (see Section 1.5 below) and store
+            the data in the file named <timing_file>.
+
+
+2. uarray2b
+    - Creates a 2D array that can be indexed by UArray2b[col][row].
+    - Array is implemented as a single UArray2 array (grid) storing individual
+      UArray arrays that serve as the blocks. Each UArray is of
+      size = blocksize * blocksize.
+    - uarry2b only allows for blocked access of its arrays allowing for faster
+      traversals due to fewer caches misses and kicks.
+
+3. a2plain
+    - a2plain acts as an interface for uarray2, acting as a standalone
+      implementation for the a2methods abstract "class".
+    - a2plain successfully delegates all the tasks it can to uarray2 and
+      includes and implementation for all of the relevant accesses defined
+      in a2methods.
+
+Unsuccesful/Unsure If Implemented:
+    - unsure if all the traversal commands work in conjunction with one another
+      properly
+    - unsure that our assert functions ppmtrans catch all the runtime errors
+      that are brought about by using invalid images.
+    - unsure if ppmtrans works on all valid images of all different sizes,
+      especially ones that are very large
+
+Architecture:
+    - ppmtrans uses methods in A2methods to perform the different image
+      transformation. The different map functions within A2Methods are used to
+      iterate through the 2D array of pixels. The user can specify the specific
+      mapping order within the arguments, but the row-major is used by default.
+
+    - When the image is read, its pixels are stored within a A2Methods_UArray2,
+      and an uninitialized A2Methods_UArray2 is created for storing the pixels
+      after transformation. Depending on the user selection, a specific
+      transformation apply function is called onto the original array. The
+      apply function is sent a pointer to the appropriate transformation
+      function which then maps out every pixel location in the original image
+      and copies them (with the transformational changes) to the second pixel
+      array for the final image. The final image is then output and
+      all allocated memory is freed.
+
+    - If the -time flag is included in program execution, we will use the
+      cputiming.h interface to get the amount of time it takes to complete each
+      of the rotations for the image, starting the timer before each rotation
+      and ending the timer after each rotation, making sure to store the value
+      returned by CPUTime_Stop to be printed out. The average time per pixel
+      will then be calculated using the dimensions of the original image.
+
+
+PART E
+
+    TABLE 1 : COL-MAJOR TIME MEASUREMENTS WITH IMAGE HALLIGAN.JPG
+              TOTAL NUMBER OF PIXELS = 1754181
+    *******************************************************************
+                 Total Time/XXXX                Time per Pixel/XXXXX
+    *******************************************************************
+    rotate  0  *  138363675.000000       *          78
+    rotate 90  *  121300194.000000       *          69
+    rotate 180 *  138573451.000000       *          78
+    rotate 270 *  122533196.000000       *          69
+    horizontal *  144119542.000000       *          82
+    vertical   *  145403727.000000       *          82
+    transpose  *  123543556.000000       *          70
+    *******************************************************************
+
+
+    TABLE 2  : ROW-MAJOR TIME MEASUREMENTS WITH IMAGE HALLIGAN.JPG
+               TOTAL NUMBER OF PIXELS = 1754181
+    *******************************************************************
+                 Total Time                   Time per Pixel
+    *******************************************************************
+    rotate  0  *  86109724.000000       *          49
+    rotate 90  *  116623856.00000       *          66
+    rotate 180 *  92958024.000000       *          52
+    rotate 270 *  115822401.00000       *          66
+    horizontal *  88519936.000000       *          50
+    vertical   *  95662127.000000       *          54
+    transpose  *  117137553.00000       *          66
+    *******************************************************************
+
+
+   TABLE 3: BLOCK-MAJOR TIME MEASUREMENTS WITH IMAGE HALLIGAN.JPG
+            TOTAL NUMBER OF PIXELS = 1754181
+   ********************************************************************
+                Total Time               Time per Pixel
+   ********************************************************************
+   rotate  0  *  118263185.000000      *          42
+   rotate 90  *  137108387.000000      *          60
+   rotate 180 *  118990394.000000      *          56
+   rotate 270 *  125178591.000000      *          71
+   horizontal *  127596660.000000      *          44
+   vertical   *  123647283.000000      *          50
+   transpose  *  125882429.000000      *          65
+   ********************************************************************
+
+ Blocked major access to memory has the best cache hit rate because you are
+ accessing memory stored right next to each other allowing you to handle a
+ single block of data in the cache before accessing the next. The only cache
+ misses on a blocked access of UArray2b would occur from accessing a new block
+ for the first time which should only occur on the first time a piece of
+ memory is either read or written to.
+
+  FIGURE 1: PREDICTED ESTIMATES OF RESULTS
+
+            row-maj access    col-maj access    block-maj access
+  ***************************************************************
+  90-deg  *       2        *         2       *         1        *
+  180-deg *       1        *         3       *         1        *
+  ***************************************************************
+
+  FIGURE 2: ACTUAL RESULTS
+
+            row-maj access    col-maj access    block-maj access
+  ***************************************************************
+  90-deg  *       4        *         5       *         2        *
+  180-deg *       3        *         6       *         1        *
+  ***************************************************************
+
+  row-major and col-major's performance was the most informative in terms of
+  locality. This is because they have the exact same amount of math as each
+  other. As seen in figure 2, row-major rotate0 and rotate180 performed
+  extremely fast, while col-maj rotate180 was very slow. Row-major and
+  col-major rotate90 additionally, were correctly predicted to be in the
+  middle of that with col-major being a little faster.
+
+  The reason behind these performance variations of course ties back into
+  locality. In block-major access there should only every be a single
+  cache miss/eviction for each time a new block need to be loaded into the
+  cache. This is because all the memory within a block will be read/written
+  before moving on to a separate piece of memory. This allows for faster
+  reads/writes because the memory stored in cache is much faster than
+  standard disk storage.
+
+  A 180-deg rotation using column-major access performed so poorly because
+  of the poor locality within the pixel storage. There were a frequent
+  number of cache misses and evictions because for each column, the data was
+  not necessarily stored within the same block in memory. This was made even
+  worse by the fact that for each column read of data in this rotation type
+  a different row in had to be accessed during the write process, doubling
+  the number of evictions/misses that occurred for this type of write.
+
+  All other rotations generally fell somewhere in between in terms of
+  locality. Data accesses were likely slower because the memory was not
+  stored at neatly together. All in all though, block-major access for
+  memory is certainly the fastest implementation.
+
+
+
+
+CPU SPECS OF COMPUTER USED DURING TESTING:
+
+processor       : 1
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214Y CPU @ 2.20GHz
+stepping        : 7
+microcode       : 0x5000029
+cpu MHz         : 2194.844
+cache size      : 16896 KB
+cpu cores       : 6
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 42 bits physical, 48 bits virtual

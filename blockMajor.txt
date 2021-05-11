@@ -1,0 +1,42 @@
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+ROTATION: 0
+Total Number of pixels: 1754181
+Total Time Taken:       118263185.000000
+Time Taken Per Pixel:   67.417892
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+ROTATION: 90
+Total Number of pixels: 1754181
+Total Time Taken:       137108387.000000
+Time Taken Per Pixel:   78.160912
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+ROTATION: 180
+Total Number of pixels: 1754181
+Total Time Taken:       118990394.000000
+Time Taken Per Pixel:   67.832449
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+ROTATION: 270
+Total Number of pixels: 1754181
+Total Time Taken:       125178591.000000
+Time Taken Per Pixel:   71.360134
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+VERTICAL TRANSFORMATION
+Total Number of pixels: 1754181
+Total Time Taken:       127596660.000000
+Time Taken Per Pixel:   72.738594
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+HORIZONTAL TRANSFORMATION
+Total Number of pixels: 1754181
+Total Time Taken:       123647283.000000
+Time Taken Per Pixel:   70.487186
+**************************************************
+This test was done from host: vm-hw04 with username: agavhe01
+TRANSPOSE TRANSFORMATION
+Total Number of pixels: 1754181
+Total Time Taken:       125882429.000000
+Time Taken Per Pixel:   71.761368
